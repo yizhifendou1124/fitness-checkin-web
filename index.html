@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身打卡</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div id="header-title"></div>
+        </header>
+        <main>
+            <section id="calendar">
+                <div id="controls">
+                    <button id="prev-month">上个月</button>
+                    <span id="current-month" class="current-month"></span>
+                    <button id="next-month">下个月</button>
+                </div>
+                <div id="check-in-summary-container">
+                    <span id="yearly-check-in-summary" class="check-in-summary"></span>
+                    <span id="check-in-summary" class="check-in-summary"></span>
+                </div>
+                <div id="calendar-container"></div>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2025 Sherwin Fitness Check-in</p>
+        </footer>
+    </div>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
