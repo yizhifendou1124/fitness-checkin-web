@@ -1,0 +1,12 @@
+{
+  "name": "fitness-checkin-web",
+  "version": "1.0.0",
+  "description": "A fitness check-in with calendar functionality.",
+  "main": "src/index.html",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "scripts": {
+    "deploy": "gh-pages -d src"
+  }
+}
