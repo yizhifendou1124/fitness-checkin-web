@@ -7,9 +7,14 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div id="app">
+    <!-- 主应用（登录后显示） -->
+    <div id="app" class="hidden">
         <header>
             <div id="header-title"></div>
+            <div id="user-bar">
+                <span id="user-email"></span>
+                <button id="logout" class="logout-btn">退出登录</button>
+            </div>
         </header>
         <main>
             <section id="calendar">
@@ -29,6 +34,27 @@
             <p>&copy; 2025 Sherwin Fitness Check-in</p>
         </footer>
     </div>
+
+    <!-- 登录界面（未登录时显示） -->
+    <div id="auth-container">
+        <div id="auth-card">
+            <h2>健身打卡</h2>
+            <p class="auth-hint">邮箱登录 · 数据自动跨设备同步</p>
+            <div id="auth-step-email">
+                <input id="auth-email" type="email" placeholder="邮箱地址" autocomplete="email">
+                <button id="send-otp" class="auth-btn">发送验证码</button>
+            </div>
+            <div id="auth-step-otp" class="hidden">
+                <input id="auth-otp" type="text" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+                <button id="verify-otp" class="auth-btn">登录</button>
+                <button id="back-to-email" class="link-btn">换个邮箱</button>
+            </div>
+            <div id="auth-message"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
 </body>
 </html>
