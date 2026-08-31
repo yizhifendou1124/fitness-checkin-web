@@ -20,6 +20,10 @@
         };
     }
 
+    function buildPasswordSignInPayload(email, password) {
+        return { email, password };
+    }
+
     function parseMagicLinkSessionFromHash(hash) {
         if (!hash) {
             return null;
@@ -41,11 +45,13 @@
 
     root.resolveAuthRedirectUrl = resolveAuthRedirectUrl;
     root.buildOtpSignInPayload = buildOtpSignInPayload;
+    root.buildPasswordSignInPayload = buildPasswordSignInPayload;
     root.parseMagicLinkSessionFromHash = parseMagicLinkSessionFromHash;
 
     if (typeof module !== "undefined" && module.exports) {
         module.exports = {
             buildOtpSignInPayload,
+            buildPasswordSignInPayload,
             parseMagicLinkSessionFromHash,
             resolveAuthRedirectUrl,
         };

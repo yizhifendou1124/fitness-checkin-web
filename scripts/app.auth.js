@@ -8,11 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- DOM 元素 ----------
     const appContainer = document.getElementById("app");
     const authContainer = document.getElementById("auth-container");
+    const authModeFixed = document.getElementById("auth-mode-fixed");
+    const authModeEmail = document.getElementById("auth-mode-email");
+    const authStepFixed = document.getElementById("auth-step-fixed");
     const authStepEmail = document.getElementById("auth-step-email");
     const authStepOtp = document.getElementById("auth-step-otp");
     const authEmail = document.getElementById("auth-email");
+    const authPassword = document.getElementById("auth-password");
     const authOtp = document.getElementById("auth-otp");
     const authMessage = document.getElementById("auth-message");
+    const fixedLoginButton = document.getElementById("fixed-login");
     const sendOtpButton = document.getElementById("send-otp");
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
@@ -40,9 +45,41 @@ document.addEventListener("DOMContentLoaded", () => {
     function showAuthLoading(msg) {
         appContainer.classList.add("hidden");
         authContainer.classList.remove("hidden");
+        authStepFixed.classList.add("hidden");
         authStepEmail.classList.add("hidden");
         authStepOtp.classList.add("hidden");
         showAuthMessage(msg, "success");
+    }
+
+    function setAuthMode(mode) {
+        const isFixedMode = mode === "fixed";
+        authModeFixed.classList.toggle("active", isFixedMode);
+        authModeEmail.classList.toggle("active", !isFixedMode);
+        authModeFixed.setAttribute("aria-pressed", String(isFixedMode));
+        authModeEmail.setAttribute("aria-pressed", String(!isFixedMode));
+        authStepFixed.classList.toggle("hidden", !isFixedMode);
+        authStepEmail.classList.toggle("hidden", isFixedMode);
+        authStepOtp.classList.add("hidden");
+        authOtp.value = "";
+        showAuthMessage("", "");
+    }
+
+    async function signInFixedUser() {
+        const password = authPassword.value.trim();
+        if (!password) {
+            showAuthMessage("请输入密码", "error");
+            return;
+        }
+
+        fixedLoginButton.disabled = true;
+        const { error } = await supabase.auth.signInWithPassword(
+            window.buildPasswordSignInPayload(SUPABASE_CONFIG.fixedLoginEmail, password)
+        );
+        fixedLoginButton.disabled = false;
+
+        if (error) {
+            showAuthMessage("登录失败：" + error.message, "error");
+        }
     }
 
     // 发送邮箱验证码
@@ -60,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (error) {
             showAuthMessage("发送失败：" + error.message, "error");
         } else {
-            showAuthMessage("验证码已发送到 " + email + "。为迁移本机旧数据，建议在此页面输入 6 位验证码；也可以点邮件链接登录。", "success");
+            showAuthMessage("验证码已发送到 " + email + "。为迁移本机旧数据，建议在此页面输入邮件中的验证码；也可以点邮件链接登录。", "success");
             authStepEmail.classList.add("hidden");
             authStepOtp.classList.remove("hidden");
         }
@@ -97,9 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
         checkInData.clear();
         appContainer.classList.add("hidden");
         authContainer.classList.remove("hidden");
+        setAuthMode("fixed");
         authStepOtp.classList.add("hidden");
-        authStepEmail.classList.remove("hidden");
         authOtp.value = "";
+        authPassword.value = "";
         showAuthMessage("", "");
     }
 
@@ -266,6 +304,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ================= 事件绑定 =================
 
+    authModeFixed.addEventListener("click", () => setAuthMode("fixed"));
+    authModeEmail.addEventListener("click", () => setAuthMode("email"));
+    fixedLoginButton.addEventListener("click", signInFixedUser);
+    authPassword.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            signInFixedUser();
+        }
+    });
     sendOtpButton.addEventListener("click", sendOtp);
     verifyOtpButton.addEventListener("click", verifyOtp);
 

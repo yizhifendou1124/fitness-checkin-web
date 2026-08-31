@@ -10,4 +10,5 @@ const SUPABASE_CONFIG = {
     url: "https://veukpfdetitqlabsjduy.supabase.co",
     anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZldWtwZmRldGl0cWxhYnNqZHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTY3NzcsImV4cCI6MjEwMzczMjc3N30.BPDiBzzx47_VU-AD-DQDm7ejD1rc0-ipvhiwYfomsCY",
     appUrl: "https://yizhifendou1124.github.io/fitness-checkin-web/",
+    fixedLoginEmail: "sherwin@fitness.local",
 };
