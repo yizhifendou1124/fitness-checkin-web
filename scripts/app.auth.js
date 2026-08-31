@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
     const userEmail = document.getElementById("user-email");
+    const openMigrationButton = document.getElementById("open-migration");
     const logoutButton = document.getElementById("logout");
 
     const calendarContainer = document.getElementById("calendar-container");
@@ -30,8 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevMonthButton = document.getElementById("prev-month");
     const nextMonthButton = document.getElementById("next-month");
     const yearlyCheckInSummary = document.getElementById("yearly-check-in-summary");
+    const migrationModal = document.getElementById("migration-modal");
+    const closeMigrationButton = document.getElementById("close-migration");
+    const migrationCurrentAccount = document.getElementById("migration-current-account");
     const migrationSourceEmail = document.getElementById("migration-source-email");
-    const migrationTargetEmail = document.getElementById("migration-target-email");
     const migrateDataButton = document.getElementById("migrate-data");
     const migrationMessage = document.getElementById("migration-message");
 
@@ -54,6 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function getMigrationMode() {
         const selected = document.querySelector('input[name="migration-mode"]:checked');
         return selected ? selected.value : "incremental";
+    }
+
+    function openMigrationModal() {
+        migrationModal.classList.remove("hidden");
+        showMigrationMessage("", "");
+        migrationSourceEmail.focus();
+    }
+
+    function closeMigrationModal() {
+        migrationModal.classList.add("hidden");
+        showMigrationMessage("", "");
     }
 
     function showAuthLoading(msg) {
@@ -139,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         appContainer.classList.remove("hidden");
         authContainer.classList.add("hidden");
         userEmail.textContent = user.email;
-        migrationTargetEmail.value = user.email || "";
+        migrationCurrentAccount.textContent = user.email || "";
         await loadCloudData();
         generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
     }
@@ -154,18 +168,24 @@ document.addEventListener("DOMContentLoaded", () => {
         authOtp.value = "";
         authPassword.value = "";
         migrationSourceEmail.value = "";
-        migrationTargetEmail.value = "";
+        migrationCurrentAccount.textContent = "";
+        closeMigrationModal();
         showMigrationMessage("", "");
         showAuthMessage("", "");
     }
 
     async function migrateData() {
         const sourceEmail = migrationSourceEmail.value.trim();
-        const targetEmail = migrationTargetEmail.value.trim();
+        const targetEmail = currentUser && currentUser.email ? currentUser.email : "";
         const migrationMode = getMigrationMode();
 
-        if (!sourceEmail || !targetEmail) {
-            showMigrationMessage("请输入 Source 账号和 To 账号", "error");
+        if (!sourceEmail) {
+            showMigrationMessage("请输入 Source 账号", "error");
+            return;
+        }
+
+        if (!targetEmail) {
+            showMigrationMessage("当前账号邮箱不存在，请重新登录后再试", "error");
             return;
         }
 
@@ -387,6 +407,18 @@ document.addEventListener("DOMContentLoaded", () => {
         await supabase.auth.signOut();
     });
 
+    openMigrationButton.addEventListener("click", openMigrationModal);
+    closeMigrationButton.addEventListener("click", closeMigrationModal);
+    migrationModal.addEventListener("click", (event) => {
+        if (event.target === migrationModal) {
+            closeMigrationModal();
+        }
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !migrationModal.classList.contains("hidden")) {
+            closeMigrationModal();
+        }
+    });
     migrateDataButton.addEventListener("click", migrateData);
 
     prevMonthButton.addEventListener("click", () => {
