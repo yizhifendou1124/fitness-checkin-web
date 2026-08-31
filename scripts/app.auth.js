@@ -77,6 +77,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return `fitness-checkin-${monthText || "calendar"}.png`;
     }
 
+    async function renderExportCanvas(useForeignObjectRendering) {
+        const exportScale = Math.max(6, window.devicePixelRatio || 1);
+        return window.html2canvas(appContainer, {
+            backgroundColor: "#f5eefc",
+            scale: exportScale,
+            width: appContainer.scrollWidth,
+            height: appContainer.scrollHeight,
+            windowWidth: appContainer.scrollWidth,
+            windowHeight: appContainer.scrollHeight,
+            useCORS: true,
+            foreignObjectRendering: useForeignObjectRendering,
+        });
+    }
+
     async function exportCheckInAsPng() {
         if (!window.html2canvas) {
             alert("导出组件加载失败，请刷新页面后重试。");
@@ -88,16 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
         appContainer.classList.add("exporting");
 
         try {
-            const exportScale = Math.max(4, window.devicePixelRatio || 1);
-            const canvas = await window.html2canvas(appContainer, {
-                backgroundColor: "#f5eefc",
-                scale: exportScale,
-                width: appContainer.scrollWidth,
-                height: appContainer.scrollHeight,
-                windowWidth: appContainer.scrollWidth,
-                windowHeight: appContainer.scrollHeight,
-                useCORS: true,
-            });
+            let canvas;
+            try {
+                canvas = await renderExportCanvas(true);
+            } catch (foreignObjectError) {
+                console.warn("高清渲染路径不可用，使用兼容模式导出：", foreignObjectError);
+                canvas = await renderExportCanvas(false);
+            }
             const downloadLink = document.createElement("a");
             downloadLink.href = canvas.toDataURL("image/png");
             downloadLink.download = buildExportFileName();
