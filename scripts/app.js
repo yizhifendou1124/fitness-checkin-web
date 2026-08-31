@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sendOtpButton.disabled = true;
         const { error } = await supabase.auth.signInWithOtp({
             email,
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: window.location.origin + window.location.pathname,
         });
         sendOtpButton.disabled = false;
         if (error) {
