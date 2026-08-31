@@ -225,3 +225,304 @@ footer p {
     color: #aaa;
     margin-top: 20px;
 }
+
+/* Hidden helper */
+.hidden {
+    display: none !important;
+}
+
+/* ================= 认证界面 ================= */
+#auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#auth-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+    padding: 30px 24px;
+    text-align: center;
+}
+
+#auth-card h2 {
+    font-size: 24px;
+    color: #444;
+    margin: 0 0 8px;
+}
+
+.auth-hint {
+    font-size: 14px;
+    color: #999;
+    margin: 0 0 18px;
+}
+
+#auth-mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background: #f3f4f8;
+    border: 1px solid #e4e6ee;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 16px;
+}
+
+.auth-mode {
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 9px 8px;
+}
+
+.auth-mode.active {
+    background: #fff;
+    color: #444;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    font-weight: bold;
+}
+
+#auth-step-fixed,
+#auth-step-email,
+#auth-step-otp {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#auth-card input {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    text-align: center;
+    outline: none;
+}
+
+#auth-card input:focus {
+    border-color: #a6c1ee;
+}
+
+.auth-btn {
+    background: linear-gradient(135deg, #ff9a9e, #ff6a88);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.auth-btn:hover {
+    opacity: 0.85;
+}
+
+.auth-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #a6c1ee;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+}
+
+#auth-message {
+    margin-top: 16px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+#auth-message.error {
+    color: #ff6a88;
+}
+
+#auth-message.success {
+    color: #66bb6a;
+}
+
+/* 用户栏（登录后显示在 header） */
+#user-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.header-action-btn {
+    background: #7c8fda;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+.header-action-btn:hover,
+.header-action-btn:active,
+.header-action-btn.active {
+    background: #5f72c7;
+    box-shadow: 0 3px 8px rgba(95, 114, 199, 0.28);
+    transform: translateY(-1px);
+}
+
+.header-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* 数据迁移 */
+#migration-modal {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.38);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    padding: 20px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 20;
+}
+
+#migration-panel {
+    margin: 0;
+    max-width: 720px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+    padding: 20px;
+    position: relative;
+    text-align: left;
+}
+
+.icon-close-btn {
+    align-items: center;
+    background: #f7f8fc;
+    border: 1px solid #e4e6ee;
+    border-radius: 50%;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    font-size: 22px;
+    height: 34px;
+    justify-content: center;
+    line-height: 1;
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    width: 34px;
+}
+
+#migration-panel h2 {
+    color: #444;
+    font-size: 20px;
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.migration-target-hint {
+    color: #777;
+    font-size: 14px;
+    margin: -6px 0 16px;
+    text-align: center;
+}
+
+#migration-current-account {
+    color: #444;
+    font-weight: bold;
+}
+
+.migration-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.migration-grid label {
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    gap: 6px;
+}
+
+.migration-grid input {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px 12px;
+}
+
+#migration-mode-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.migration-mode-option {
+    align-items: center;
+    background: #f7f8fc;
+    border: 1px solid #e4e6ee;
+    border-radius: 8px;
+    color: #555;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+}
+
+.migration-btn {
+    background: linear-gradient(135deg, #a6c1ee, #fbc2eb);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 11px 18px;
+}
+
+.migration-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+#migration-message {
+    color: #888;
+    font-size: 14px;
+    margin-top: 12px;
+    min-height: 20px;
+}
+
+#migration-message.error {
+    color: #ff6a88;
+}
+
+#migration-message.success {
+    color: #66bb6a;
+}
+
+@media (max-width: 640px) {
+    .migration-grid {
+        grid-template-columns: 1fr;
+    }
+}
