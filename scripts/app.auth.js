@@ -88,13 +88,18 @@ document.addEventListener("DOMContentLoaded", () => {
         appContainer.classList.add("exporting");
 
         try {
+            const exportScale = Math.max(4, window.devicePixelRatio || 1);
             const canvas = await window.html2canvas(appContainer, {
                 backgroundColor: "#f5eefc",
-                scale: Math.max(2, window.devicePixelRatio || 1),
+                scale: exportScale,
+                width: appContainer.scrollWidth,
+                height: appContainer.scrollHeight,
+                windowWidth: appContainer.scrollWidth,
+                windowHeight: appContainer.scrollHeight,
                 useCORS: true,
             });
             const downloadLink = document.createElement("a");
-            downloadLink.href = canvas.toDataURL("image/jpeg", 0.92);
+            downloadLink.href = canvas.toDataURL("image/jpeg", 0.98);
             downloadLink.download = buildExportFileName();
             downloadLink.click();
         } catch (error) {
