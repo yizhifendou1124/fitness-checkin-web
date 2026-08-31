@@ -371,28 +371,33 @@ footer p {
     margin-right: 12px;
 }
 
-.secondary-btn,
-.logout-btn {
-    background: none;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    color: #888;
-    padding: 6px 16px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.secondary-btn:hover {
-    background: #a6c1ee;
-    border-color: #a6c1ee;
-    color: white;
-}
-
-.logout-btn:hover {
+.header-action-btn {
     background: #ff9a9e;
-    border-color: #ff9a9e;
+    border: none;
+    border-radius: 20px;
     color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+.header-action-btn:hover,
+.header-action-btn:active,
+.header-action-btn.active {
+    background: #ff6a88;
+    box-shadow: 0 3px 8px rgba(255, 106, 136, 0.28);
+    transform: translateY(-1px);
+}
+
+.logout-btn {
+    background: #a6c1ee;
+}
+
+.logout-btn:hover,
+.logout-btn:active {
+    background: #7fa3e8;
+    box-shadow: 0 3px 8px rgba(127, 163, 232, 0.28);
 }
 
 /* 数据迁移 */
@@ -445,18 +450,6 @@ footer p {
     font-size: 20px;
     margin: 0 0 16px;
     text-align: center;
-}
-
-.migration-target-hint {
-    color: #777;
-    font-size: 14px;
-    margin: -6px 0 16px;
-    text-align: center;
-}
-
-#migration-current-account {
-    color: #444;
-    font-weight: bold;
 }
 
 .migration-grid {
