@@ -11,9 +11,22 @@
         return location.origin + location.pathname;
     }
 
+    function buildOtpSignInPayload(email, config, location) {
+        return {
+            email,
+            options: {
+                emailRedirectTo: resolveAuthRedirectUrl(config, location),
+            },
+        };
+    }
+
     root.resolveAuthRedirectUrl = resolveAuthRedirectUrl;
+    root.buildOtpSignInPayload = buildOtpSignInPayload;
 
     if (typeof module !== "undefined" && module.exports) {
-        module.exports = { resolveAuthRedirectUrl };
+        module.exports = {
+            buildOtpSignInPayload,
+            resolveAuthRedirectUrl,
+        };
     }
 })(typeof window !== "undefined" ? window : globalThis);

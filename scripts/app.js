@@ -45,10 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         sendOtpButton.disabled = true;
-        const { error } = await supabase.auth.signInWithOtp({
-            email,
-            emailRedirectTo: window.resolveAuthRedirectUrl(SUPABASE_CONFIG, window.location),
-        });
+        const { error } = await supabase.auth.signInWithOtp(
+            window.buildOtpSignInPayload(email, SUPABASE_CONFIG, window.location)
+        );
         sendOtpButton.disabled = false;
         if (error) {
             showAuthMessage("发送失败：" + error.message, "error");
