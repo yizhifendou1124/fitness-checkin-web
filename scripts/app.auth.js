@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
     const openMigrationButton = document.getElementById("open-migration");
+    const exportCheckinButton = document.getElementById("export-checkin");
     const logoutButton = document.getElementById("logout");
 
     const calendarContainer = document.getElementById("calendar-container");
@@ -69,6 +70,41 @@ document.addEventListener("DOMContentLoaded", () => {
         migrationModal.classList.add("hidden");
         openMigrationButton.classList.remove("active");
         showMigrationMessage("", "");
+    }
+
+    function buildExportFileName() {
+        const monthText = currentMonthDisplay.textContent.trim().replace(/\s+/g, "-");
+        return `fitness-checkin-${monthText || "calendar"}.jpg`;
+    }
+
+    async function exportCheckInAsJpg() {
+        if (!window.html2canvas) {
+            alert("导出组件加载失败，请刷新页面后重试。");
+            return;
+        }
+
+        exportCheckinButton.disabled = true;
+        exportCheckinButton.classList.add("active");
+        appContainer.classList.add("exporting");
+
+        try {
+            const canvas = await window.html2canvas(appContainer, {
+                backgroundColor: "#f5eefc",
+                scale: Math.max(2, window.devicePixelRatio || 1),
+                useCORS: true,
+            });
+            const downloadLink = document.createElement("a");
+            downloadLink.href = canvas.toDataURL("image/jpeg", 0.92);
+            downloadLink.download = buildExportFileName();
+            downloadLink.click();
+        } catch (error) {
+            console.error("导出 JPG 失败：", error);
+            alert("导出失败，请稍后重试。");
+        } finally {
+            appContainer.classList.remove("exporting");
+            exportCheckinButton.classList.remove("active");
+            exportCheckinButton.disabled = false;
+        }
     }
 
     function showAuthLoading(msg) {
@@ -408,6 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     openMigrationButton.addEventListener("click", openMigrationModal);
+    exportCheckinButton.addEventListener("click", exportCheckInAsJpg);
     closeMigrationButton.addEventListener("click", closeMigrationModal);
     migrationModal.addEventListener("click", (event) => {
         if (event.target === migrationModal) {
