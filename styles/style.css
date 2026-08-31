@@ -364,15 +364,8 @@ footer p {
     color: #666;
 }
 
-#user-email {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-right: 12px;
-}
-
 .header-action-btn {
-    background: #ff9a9e;
+    background: #7c8fda;
     border: none;
     border-radius: 20px;
     color: white;
@@ -385,19 +378,9 @@ footer p {
 .header-action-btn:hover,
 .header-action-btn:active,
 .header-action-btn.active {
-    background: #ff6a88;
-    box-shadow: 0 3px 8px rgba(255, 106, 136, 0.28);
+    background: #5f72c7;
+    box-shadow: 0 3px 8px rgba(95, 114, 199, 0.28);
     transform: translateY(-1px);
-}
-
-.logout-btn {
-    background: #a6c1ee;
-}
-
-.logout-btn:hover,
-.logout-btn:active {
-    background: #7fa3e8;
-    box-shadow: 0 3px 8px rgba(127, 163, 232, 0.28);
 }
 
 /* 数据迁移 */
@@ -450,6 +433,18 @@ footer p {
     font-size: 20px;
     margin: 0 0 16px;
     text-align: center;
+}
+
+.migration-target-hint {
+    color: #777;
+    font-size: 14px;
+    margin: -6px 0 16px;
+    text-align: center;
+}
+
+#migration-current-account {
+    color: #444;
+    font-weight: bold;
 }
 
 .migration-grid {

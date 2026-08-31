@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const sendOtpButton = document.getElementById("send-otp");
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
-    const userEmail = document.getElementById("user-email");
     const openMigrationButton = document.getElementById("open-migration");
     const logoutButton = document.getElementById("logout");
 
@@ -33,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const yearlyCheckInSummary = document.getElementById("yearly-check-in-summary");
     const migrationModal = document.getElementById("migration-modal");
     const closeMigrationButton = document.getElementById("close-migration");
+    const migrationCurrentAccount = document.getElementById("migration-current-account");
     const migrationSourceEmail = document.getElementById("migration-source-email");
     const migrateDataButton = document.getElementById("migrate-data");
     const migrationMessage = document.getElementById("migration-message");
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentUser = user;
         appContainer.classList.remove("hidden");
         authContainer.classList.add("hidden");
-        userEmail.textContent = user.email;
+        migrationCurrentAccount.textContent = user.email || "";
         await loadCloudData();
         generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
     }
@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         authOtp.value = "";
         authPassword.value = "";
         migrationSourceEmail.value = "";
+        migrationCurrentAccount.textContent = "";
         closeMigrationModal();
         showMigrationMessage("", "");
         showAuthMessage("", "");
