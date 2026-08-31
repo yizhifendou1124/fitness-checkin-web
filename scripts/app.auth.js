@@ -37,6 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
         authMessage.className = type;
     }
 
+    function showAuthLoading(msg) {
+        appContainer.classList.add("hidden");
+        authContainer.classList.remove("hidden");
+        authStepEmail.classList.add("hidden");
+        authStepOtp.classList.add("hidden");
+        showAuthMessage(msg, "success");
+    }
+
     // 发送邮箱验证码
     async function sendOtp() {
         const email = authEmail.value.trim();
@@ -52,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (error) {
             showAuthMessage("发送失败：" + error.message, "error");
         } else {
-            showAuthMessage("验证码已发送到 " + email + "，请查收", "success");
+            showAuthMessage("验证码已发送到 " + email + "。为迁移本机旧数据，建议在此页面输入 6 位验证码；也可以点邮件链接登录。", "success");
             authStepEmail.classList.add("hidden");
             authStepOtp.classList.remove("hidden");
         }
@@ -285,6 +293,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // ================= 初始化 =================
 
     async function init() {
+        showAuthLoading("正在登录并同步数据...");
+
+        const magicLinkSession = window.parseMagicLinkSessionFromHash(window.location.hash);
+        if (magicLinkSession) {
+            const { error } = await supabase.auth.setSession(magicLinkSession);
+            if (error) {
+                handleSignedOut();
+                showAuthMessage("登录链接已失效，请重新发送验证码。", "error");
+                return;
+            }
+            window.history.replaceState(null, "", window.location.pathname);
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             await handleSignedIn(session.user);
