@@ -388,10 +388,6 @@ footer p {
     opacity: 0.65;
 }
 
-#app.exporting #user-bar {
-    display: none;
-}
-
 /* 数据迁移 */
 #migration-modal {
     align-items: center;
