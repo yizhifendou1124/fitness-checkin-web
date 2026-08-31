@@ -77,47 +77,252 @@ document.addEventListener("DOMContentLoaded", () => {
         return `fitness-checkin-${monthText || "calendar"}.png`;
     }
 
-    async function renderExportCanvas(useForeignObjectRendering) {
-        const exportScale = Math.max(6, window.devicePixelRatio || 1);
-        return window.html2canvas(appContainer, {
-            backgroundColor: "#f5eefc",
-            scale: exportScale,
-            width: appContainer.scrollWidth,
-            height: appContainer.scrollHeight,
-            windowWidth: appContainer.scrollWidth,
-            windowHeight: appContainer.scrollHeight,
-            useCORS: true,
-            foreignObjectRendering: useForeignObjectRendering,
+    const EXPORT_WIDTH = 760;
+    const EXPORT_HEIGHT = 980;
+    const EXPORT_PIXEL_RATIO = 4;
+
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+    }
+
+    function createGradient(ctx, x0, y0, x1, y1, colors) {
+        const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+        colors.forEach(([stop, color]) => gradient.addColorStop(stop, color));
+        return gradient;
+    }
+
+    function fillRoundedRect(ctx, x, y, width, height, radius, fillStyle) {
+        ctx.fillStyle = fillStyle;
+        drawRoundedRect(ctx, x, y, width, height, radius);
+        ctx.fill();
+    }
+
+    function drawCenteredText(ctx, text, x, y, font, color) {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y);
+    }
+
+    function getMonthStats(year, month) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const checkedInDays = Array.from(checkInData).filter((date) => {
+            const [y, m] = date.split("-").map(Number);
+            return y === year && m === month + 1;
+        }).length;
+        const yearlyCheckedInDays = Array.from(checkInData).filter((date) => {
+            const [y] = date.split("-").map(Number);
+            return y === year;
+        }).length;
+
+        return { daysInMonth, checkedInDays, yearlyCheckedInDays };
+    }
+
+    function drawExportPill(ctx, text, x, y, width, height, colors) {
+        fillRoundedRect(
+            ctx,
+            x,
+            y,
+            width,
+            height,
+            height / 2,
+            createGradient(ctx, x, y, x + width, y + height, colors)
+        );
+        drawCenteredText(ctx, text, x + width / 2, y + height / 2, "700 18px Arial, sans-serif", "#ffffff");
+    }
+
+    function drawExportCalendar(ctx, year, month) {
+        const calendarX = 70;
+        const calendarY = 450;
+        const calendarWidth = 620;
+        const headerHeight = 58;
+        const cellHeight = 62;
+        const cellWidth = calendarWidth / 7;
+        const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+        const { daysInMonth } = getMonthStats(year, month);
+
+        fillRoundedRect(ctx, calendarX, calendarY, calendarWidth, headerHeight + cellHeight * 6, 18, "#ffffff");
+        ctx.strokeStyle = "#eeeeee";
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, calendarX, calendarY, calendarWidth, headerHeight + cellHeight * 6, 18);
+        ctx.stroke();
+
+        ctx.fillStyle = "#f7f7f7";
+        drawRoundedRect(ctx, calendarX, calendarY, calendarWidth, headerHeight, 18);
+        ctx.fill();
+
+        weekdays.forEach((day, index) => {
+            drawCenteredText(
+                ctx,
+                day,
+                calendarX + cellWidth * index + cellWidth / 2,
+                calendarY + headerHeight / 2,
+                "700 17px Arial, sans-serif",
+                "#888888"
+            );
+        });
+
+        ctx.strokeStyle = "#eeeeee";
+        ctx.lineWidth = 1;
+        for (let row = 0; row <= 6; row++) {
+            const y = calendarY + headerHeight + row * cellHeight;
+            ctx.beginPath();
+            ctx.moveTo(calendarX, y);
+            ctx.lineTo(calendarX + calendarWidth, y);
+            ctx.stroke();
+        }
+        for (let column = 1; column < 7; column++) {
+            const x = calendarX + column * cellWidth;
+            ctx.beginPath();
+            ctx.moveTo(x, calendarY);
+            ctx.lineTo(x, calendarY + headerHeight + cellHeight * 6);
+            ctx.stroke();
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const position = firstDay + day - 1;
+            const row = Math.floor(position / 7);
+            const column = position % 7;
+            const centerX = calendarX + column * cellWidth + cellWidth / 2;
+            const centerY = calendarY + headerHeight + row * cellHeight + cellHeight / 2;
+            const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const checked = checkInData.has(dateKey);
+
+            if (checked) {
+                ctx.fillStyle = "#a1c4fd";
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 22, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            drawCenteredText(
+                ctx,
+                String(day),
+                centerX,
+                centerY,
+                checked ? "700 19px Arial, sans-serif" : "500 18px Arial, sans-serif",
+                checked ? "#ffffff" : "#555555"
+            );
+        }
+    }
+
+    function drawExportImage(ctx) {
+        return new Promise((resolve) => {
+            const image = new Image();
+            image.onload = () => {
+                const x = 60;
+                const y = 72;
+                const width = 640;
+                const height = 170;
+                const scale = Math.max(width / image.width, height / image.height);
+                const sourceWidth = width / scale;
+                const sourceHeight = height / scale;
+                const sourceX = (image.width - sourceWidth) / 2;
+                const sourceY = image.height * 0.05;
+
+                ctx.save();
+                drawRoundedRect(ctx, x, y, width, height, 18);
+                ctx.clip();
+                ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+                ctx.restore();
+                resolve();
+            };
+            image.onerror = () => {
+                fillRoundedRect(
+                    ctx,
+                    60,
+                    72,
+                    640,
+                    170,
+                    18,
+                    createGradient(ctx, 60, 72, 700, 242, [[0, "#fbc2eb"], [1, "#a6c1ee"]])
+                );
+                resolve();
+            };
+            image.src = "assets/2.jpg";
         });
     }
 
-    async function exportCheckInAsPng() {
-        if (!window.html2canvas) {
-            alert("导出组件加载失败，请刷新页面后重试。");
-            return;
-        }
-
-        exportCheckinButton.disabled = true;
-        exportCheckinButton.classList.add("active");
-        appContainer.classList.add("exporting");
-
-        try {
-            let canvas;
-            try {
-                canvas = await renderExportCanvas(true);
-            } catch (foreignObjectError) {
-                console.warn("高清渲染路径不可用，使用兼容模式导出：", foreignObjectError);
-                canvas = await renderExportCanvas(false);
+    function downloadCanvasPng(canvas) {
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                alert("导出失败，请稍后重试。");
+                return;
             }
+
             const downloadLink = document.createElement("a");
-            downloadLink.href = canvas.toDataURL("image/png");
+            const objectUrl = URL.createObjectURL(blob);
+            downloadLink.href = objectUrl;
             downloadLink.download = buildExportFileName();
             downloadLink.click();
+            URL.revokeObjectURL(objectUrl);
+        }, "image/png");
+    }
+
+    async function renderHighDefinitionExportCanvas() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const { daysInMonth, checkedInDays, yearlyCheckedInDays } = getMonthStats(year, month);
+        const canvas = document.createElement("canvas");
+        canvas.width = EXPORT_WIDTH * EXPORT_PIXEL_RATIO;
+        canvas.height = EXPORT_HEIGHT * EXPORT_PIXEL_RATIO;
+
+        const ctx = canvas.getContext("2d");
+        ctx.scale(EXPORT_PIXEL_RATIO, EXPORT_PIXEL_RATIO);
+        ctx.textRendering = "geometricPrecision";
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        ctx.fillStyle = createGradient(ctx, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT, [[0, "#fbc2eb"], [1, "#a6c1ee"]]);
+        ctx.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
+        ctx.shadowColor = "rgba(0, 0, 0, 0.18)";
+        ctx.shadowBlur = 24;
+        ctx.shadowOffsetY = 10;
+        fillRoundedRect(ctx, 40, 40, 680, 900, 22, "#ffffff");
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        await drawExportImage(ctx);
+
+        drawExportPill(ctx, "上个月", 70, 282, 124, 44, [[0, "#ff9a9e"], [1, "#ff6a88"]]);
+        drawExportPill(ctx, `${year}年 ${month + 1}月`, 254, 276, 252, 56, [[0, "#fbc2eb"], [1, "#a6c1ee"]]);
+        drawExportPill(ctx, "下个月", 566, 282, 124, 44, [[0, "#ff9a9e"], [1, "#ff6a88"]]);
+
+        fillRoundedRect(ctx, 70, 360, 620, 66, 14, "#f9f9f9");
+        ctx.strokeStyle = "#dddddd";
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, 70, 360, 620, 66, 14);
+        ctx.stroke();
+        drawExportPill(ctx, `${year}年：${yearlyCheckedInDays}`, 96, 373, 180, 40, [[0, "#66bb6a"], [1, "#a5d6a7"]]);
+        drawExportPill(ctx, `本月：${checkedInDays} / ${daysInMonth}`, 492, 373, 170, 40, [[0, "#a1c4fd"], [1, "#c2e9fb"]]);
+
+        drawExportCalendar(ctx, year, month);
+        drawCenteredText(ctx, "© 2026 Sherwin Fitness Check-in", EXPORT_WIDTH / 2, 916, "500 15px Arial, sans-serif", "#aaaaaa");
+
+        return canvas;
+    }
+
+    async function exportCheckInAsPng() {
+        exportCheckinButton.disabled = true;
+        exportCheckinButton.classList.add("active");
+
+        try {
+            const canvas = await renderHighDefinitionExportCanvas();
+            downloadCanvasPng(canvas);
         } catch (error) {
             console.error("导出 PNG 失败：", error);
             alert("导出失败，请稍后重试。");
         } finally {
-            appContainer.classList.remove("exporting");
             exportCheckinButton.classList.remove("active");
             exportCheckinButton.disabled = false;
         }
