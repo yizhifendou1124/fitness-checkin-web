@@ -74,10 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function buildExportFileName() {
         const monthText = currentMonthDisplay.textContent.trim().replace(/\s+/g, "-");
-        return `fitness-checkin-${monthText || "calendar"}.jpg`;
+        return `fitness-checkin-${monthText || "calendar"}.png`;
     }
 
-    async function exportCheckInAsJpg() {
+    async function exportCheckInAsPng() {
         if (!window.html2canvas) {
             alert("导出组件加载失败，请刷新页面后重试。");
             return;
@@ -99,11 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 useCORS: true,
             });
             const downloadLink = document.createElement("a");
-            downloadLink.href = canvas.toDataURL("image/jpeg", 0.98);
+            downloadLink.href = canvas.toDataURL("image/png");
             downloadLink.download = buildExportFileName();
             downloadLink.click();
         } catch (error) {
-            console.error("导出 JPG 失败：", error);
+            console.error("导出 PNG 失败：", error);
             alert("导出失败，请稍后重试。");
         } finally {
             appContainer.classList.remove("exporting");
@@ -449,7 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     openMigrationButton.addEventListener("click", openMigrationModal);
-    exportCheckinButton.addEventListener("click", exportCheckInAsJpg);
+    exportCheckinButton.addEventListener("click", exportCheckInAsPng);
     closeMigrationButton.addEventListener("click", closeMigrationModal);
     migrationModal.addEventListener("click", (event) => {
         if (event.target === migrationModal) {
