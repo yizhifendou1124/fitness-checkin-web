@@ -386,3 +386,97 @@ footer p {
     border-color: #ff9a9e;
     color: white;
 }
+
+/* 数据迁移 */
+#migration-panel {
+    margin: 24px auto 0;
+    max-width: 720px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+    padding: 20px;
+    text-align: left;
+}
+
+#migration-panel h2 {
+    color: #444;
+    font-size: 20px;
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.migration-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.migration-grid label {
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    gap: 6px;
+}
+
+.migration-grid input {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px 12px;
+}
+
+#migration-mode-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.migration-mode-option {
+    align-items: center;
+    background: #f7f8fc;
+    border: 1px solid #e4e6ee;
+    border-radius: 8px;
+    color: #555;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+}
+
+.migration-btn {
+    background: linear-gradient(135deg, #a6c1ee, #fbc2eb);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 11px 18px;
+}
+
+.migration-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+#migration-message {
+    color: #888;
+    font-size: 14px;
+    margin-top: 12px;
+    min-height: 20px;
+}
+
+#migration-message.error {
+    color: #ff6a88;
+}
+
+#migration-message.success {
+    color: #66bb6a;
+}
+
+@media (max-width: 640px) {
+    .migration-grid {
+        grid-template-columns: 1fr;
+    }
+}

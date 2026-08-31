@@ -30,6 +30,31 @@
                 </div>
                 <div id="calendar-container"></div>
             </section>
+            <section id="migration-panel">
+                <h2>数据迁移</h2>
+                <div class="migration-grid">
+                    <label>
+                        Source 账号
+                        <input id="migration-source-email" type="email" placeholder="zhaoxiwen1124@gmail.com">
+                    </label>
+                    <label>
+                        To 账号
+                        <input id="migration-target-email" type="email" placeholder="zxw@fitness.com">
+                    </label>
+                </div>
+                <div id="migration-mode-group" role="radiogroup" aria-label="迁移方式">
+                    <label class="migration-mode-option">
+                        <input id="migration-mode-incremental" name="migration-mode" type="radio" value="incremental" checked>
+                        增量复制
+                    </label>
+                    <label class="migration-mode-option">
+                        <input id="migration-mode-overwrite" name="migration-mode" type="radio" value="overwrite">
+                        全量覆盖
+                    </label>
+                </div>
+                <button id="migrate-data" class="migration-btn">开始迁移</button>
+                <div id="migration-message"></div>
+            </section>
         </main>
         <footer>
             <p>&copy; 2025 Sherwin Fitness Check-in</p>

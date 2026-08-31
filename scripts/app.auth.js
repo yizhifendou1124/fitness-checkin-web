@@ -30,6 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevMonthButton = document.getElementById("prev-month");
     const nextMonthButton = document.getElementById("next-month");
     const yearlyCheckInSummary = document.getElementById("yearly-check-in-summary");
+    const migrationSourceEmail = document.getElementById("migration-source-email");
+    const migrationTargetEmail = document.getElementById("migration-target-email");
+    const migrateDataButton = document.getElementById("migrate-data");
+    const migrationMessage = document.getElementById("migration-message");
 
     let currentDate = new Date();
     let currentUser = null;
@@ -40,6 +44,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function showAuthMessage(msg, type) {
         authMessage.textContent = msg;
         authMessage.className = type;
+    }
+
+    function showMigrationMessage(msg, type) {
+        migrationMessage.textContent = msg;
+        migrationMessage.className = type;
+    }
+
+    function getMigrationMode() {
+        const selected = document.querySelector('input[name="migration-mode"]:checked');
+        return selected ? selected.value : "incremental";
     }
 
     function showAuthLoading(msg) {
@@ -125,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
         appContainer.classList.remove("hidden");
         authContainer.classList.add("hidden");
         userEmail.textContent = user.email;
+        migrationTargetEmail.value = user.email || "";
         await loadCloudData();
         generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
     }
@@ -138,7 +153,53 @@ document.addEventListener("DOMContentLoaded", () => {
         authStepOtp.classList.add("hidden");
         authOtp.value = "";
         authPassword.value = "";
+        migrationSourceEmail.value = "";
+        migrationTargetEmail.value = "";
+        showMigrationMessage("", "");
         showAuthMessage("", "");
+    }
+
+    async function migrateData() {
+        const sourceEmail = migrationSourceEmail.value.trim();
+        const targetEmail = migrationTargetEmail.value.trim();
+        const migrationMode = getMigrationMode();
+
+        if (!sourceEmail || !targetEmail) {
+            showMigrationMessage("请输入 Source 账号和 To 账号", "error");
+            return;
+        }
+
+        if (migrationMode === "overwrite" && !window.confirm("全量覆盖会先清空 To 账号当前打卡数据，再复制 Source 账号数据。确认继续？")) {
+            return;
+        }
+
+        migrateDataButton.disabled = true;
+        showMigrationMessage("正在迁移...", "success");
+
+        const { data, error } = await supabase.rpc("copy_checkins_between_emails", {
+            source_email: sourceEmail,
+            target_email: targetEmail,
+            migration_mode: migrationMode,
+        });
+
+        migrateDataButton.disabled = false;
+
+        if (error) {
+            showMigrationMessage("迁移失败：" + error.message, "error");
+            return;
+        }
+
+        const result = Array.isArray(data) ? data[0] : data;
+        const copiedCount = result ? result.copied_count : 0;
+        const targetAfterCount = result ? result.target_after_count : 0;
+        const actionText = migrationMode === "overwrite" ? "全量覆盖" : "增量复制";
+
+        showMigrationMessage(`${actionText}完成：新增 ${copiedCount} 条，To 账号当前共 ${targetAfterCount} 条。`, "success");
+
+        if (currentUser.email && targetEmail.toLowerCase() === currentUser.email.toLowerCase()) {
+            await loadCloudData();
+            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        }
     }
 
     // ================= 数据同步 =================
@@ -325,6 +386,8 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButton.addEventListener("click", async () => {
         await supabase.auth.signOut();
     });
+
+    migrateDataButton.addEventListener("click", migrateData);
 
     prevMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
