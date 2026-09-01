@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 把当前打卡页导出为高清 PNG 图片
     async function exportImage() {
-        if (typeof html2canvas === "undefined") {
+        if (typeof htmlToImage === "undefined") {
             alert("导出组件未加载，请刷新页面后重试");
             return;
         }
@@ -397,23 +397,18 @@ document.addEventListener("DOMContentLoaded", () => {
         exportImageButton.textContent = "生成中...";
 
         try {
-            const canvas = await html2canvas(appContainer, {
-                scale: 3,                 // 3 倍分辨率，保证高清
+            const dataUrl = await htmlToImage.toPng(appContainer, {
+                pixelRatio: 4,                 // 4 倍分辨率，保证高清
                 backgroundColor: "#ffffff",
-                useCORS: true,            // 允许加载背景图片
-                onclone: (clonedDoc) => {
-                    // 导出时隐藏所有按钮，让图片更干净
-                    clonedDoc.querySelectorAll("button").forEach((btn) => {
-                        btn.style.display = "none";
-                    });
-                },
+                cacheBust: true,               // 绕过缓存，确保背景图等资源加载到最新
+                filter: (node) => node.tagName !== "BUTTON", // 导出时排除所有按钮
             });
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1;
             const link = document.createElement("a");
             link.download = `健身打卡-${year}年${month}月.png`;
-            link.href = canvas.toDataURL("image/png");
+            link.href = dataUrl;
             link.click();
         } catch (err) {
             console.error("导出失败：", err);
