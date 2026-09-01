@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
     const openMigrationButton = document.getElementById("open-migration");
+    const exportImageButton = document.getElementById("export-image");
     const logoutButton = document.getElementById("logout");
 
     const calendarContainer = document.getElementById("calendar-container");
@@ -383,6 +384,46 @@ document.addEventListener("DOMContentLoaded", () => {
         currentMonthDisplay.textContent = `${year}年 ${month}月`;
     }
 
+    // ================= 导出图片 =================
+
+    // 把当前打卡页导出为高清 PNG 图片
+    async function exportImage() {
+        if (typeof html2canvas === "undefined") {
+            alert("导出组件未加载，请刷新页面后重试");
+            return;
+        }
+
+        exportImageButton.disabled = true;
+        exportImageButton.textContent = "生成中...";
+
+        try {
+            const canvas = await html2canvas(appContainer, {
+                scale: 3,                 // 3 倍分辨率，保证高清
+                backgroundColor: "#ffffff",
+                useCORS: true,            // 允许加载背景图片
+                onclone: (clonedDoc) => {
+                    // 导出时隐藏所有按钮，让图片更干净
+                    clonedDoc.querySelectorAll("button").forEach((btn) => {
+                        btn.style.display = "none";
+                    });
+                },
+            });
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            const link = document.createElement("a");
+            link.download = `健身打卡-${year}年${month}月.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        } catch (err) {
+            console.error("导出失败：", err);
+            alert("导出失败：" + (err && err.message ? err.message : err));
+        } finally {
+            exportImageButton.disabled = false;
+            exportImageButton.textContent = "导出图片";
+        }
+    }
+
     // ================= 事件绑定 =================
 
     authModeFixed.addEventListener("click", () => setAuthMode("fixed"));
@@ -408,6 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     openMigrationButton.addEventListener("click", openMigrationModal);
+    exportImageButton.addEventListener("click", exportImage);
     closeMigrationButton.addEventListener("click", closeMigrationModal);
     migrationModal.addEventListener("click", (event) => {
         if (event.target === migrationModal) {
