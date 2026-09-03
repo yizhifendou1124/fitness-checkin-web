@@ -86,6 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
         downloadLink.click();
     }
 
+    function waitForStableExportFrame() {
+        return new Promise((resolve) => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(resolve);
+            });
+        });
+    }
+
     async function exportCheckInAsPng() {
         if (isExporting) {
             return;
@@ -99,18 +107,18 @@ document.addEventListener("DOMContentLoaded", () => {
         isExporting = true;
 
         try {
-            const width = appContainer.scrollWidth;
-            const height = appContainer.scrollHeight;
+            exportCheckinButton.blur();
+            await waitForStableExportFrame();
+
+            const appBounds = appContainer.getBoundingClientRect();
+            const width = Math.ceil(appBounds.width);
+            const height = Math.ceil(appBounds.height);
             const dataUrl = await window.htmlToImage.toPng(appContainer, {
                 pixelRatio: EXPORT_PIXEL_RATIO,
                 cacheBust: true,
                 backgroundColor: "#ffffff",
                 width,
                 height,
-                style: {
-                    width: `${width}px`,
-                    height: `${height}px`,
-                },
             });
 
             downloadPng(dataUrl);
