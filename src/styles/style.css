@@ -391,6 +391,10 @@ footer p {
     opacity: 0.65;
 }
 
+#app.is-exporting #user-bar {
+    margin-bottom: 48px !important;
+}
+
 #app.is-exporting #export-checkin,
 #app.is-exporting #export-checkin:hover,
 #app.is-exporting #export-checkin:active,
