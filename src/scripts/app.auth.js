@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         isExporting = true;
+        appContainer.classList.add("is-exporting");
 
         try {
             exportCheckinButton.blur();
@@ -126,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("导出 PNG 失败：", error);
             alert("导出失败，请稍后重试。");
         } finally {
+            appContainer.classList.remove("is-exporting");
             isExporting = false;
         }
     }

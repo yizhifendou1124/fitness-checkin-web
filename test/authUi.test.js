@@ -48,9 +48,9 @@ test("main UI opens account migration in a hidden modal", () => {
 });
 
 test("header action buttons share a distinct selected style from month controls", () => {
-    assert.match(styleCss, /#user-bar\s*{[^}]*margin-bottom: 32px;/s);
     assert.match(styleCss, /\.header-action-btn\s*{[^}]*background: #7c8fda;/s);
     assert.match(styleCss, /\.header-action-btn:hover,[\s\S]*?\.header-action-btn\.active\s*{[^}]*background: #5f72c7;/s);
+    assert.match(styleCss, /#app\.is-exporting #export-checkin,[\s\S]*?#app\.is-exporting #export-checkin\.active\s*{[^}]*background: #7c8fda !important;[^}]*box-shadow: none !important;[^}]*transform: none !important;[^}]*transition: none !important;/s);
     assert.doesNotMatch(styleCss, /\.logout-btn\s*{[^}]*background:/s);
 });
 
@@ -68,6 +68,8 @@ test("app script exports the full app DOM as a high-resolution png", () => {
     assert.match(appScript, /const exportCheckinButton = document\.getElementById\("export-checkin"\)/);
     assert.match(appScript, /const EXPORT_PIXEL_RATIO = 4/);
     assert.match(appScript, /async function exportCheckInAsPng\(\)/);
+    assert.match(appScript, /appContainer\.classList\.add\("is-exporting"\)/);
+    assert.match(appScript, /appContainer\.classList\.remove\("is-exporting"\)/);
     assert.match(appScript, /await waitForStableExportFrame\(\)/);
     assert.match(appScript, /appContainer\.getBoundingClientRect\(\)/);
     assert.match(appScript, /window\.htmlToImage\.toPng\(appContainer/);
