@@ -359,7 +359,7 @@ footer p {
     gap: 8px;
     justify-content: flex-end;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     font-size: 14px;
     color: #666;
 }
@@ -386,6 +386,16 @@ footer p {
 .header-action-btn:disabled {
     cursor: not-allowed;
     opacity: 0.65;
+}
+
+#app.is-exporting #export-checkin,
+#app.is-exporting #export-checkin:hover,
+#app.is-exporting #export-checkin:active,
+#app.is-exporting #export-checkin.active {
+    background: #7c8fda !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
 }
 
 /* 数据迁移 */
