@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const openMigrationButton = document.getElementById("open-migration");
     const exportCheckinButton = document.getElementById("export-checkin");
     const logoutButton = document.getElementById("logout");
+    const userBar = document.getElementById("user-bar");
 
     const calendarContainer = document.getElementById("calendar-container");
     const currentMonthDisplay = document.getElementById("current-month");
@@ -43,6 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let isExporting = false;
     const checkInData = new Set();
     const EXPORT_PIXEL_RATIO = 4;
+    const EXPORT_USER_BAR_MARGIN_BOTTOM = "96px";
+    const EXPORT_CONTROLS_MARGIN_TOP = "20px";
 
     // ================= 认证 =================
 
@@ -94,6 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function applyExportLayoutOverrides() {
+        const previousUserBarMarginBottom = userBar.style.marginBottom;
+        const previousControlsMarginTop = controls.style.marginTop;
+
+        userBar.style.marginBottom = EXPORT_USER_BAR_MARGIN_BOTTOM;
+        controls.style.marginTop = EXPORT_CONTROLS_MARGIN_TOP;
+
+        return () => {
+            userBar.style.marginBottom = previousUserBarMarginBottom;
+            controls.style.marginTop = previousControlsMarginTop;
+        };
+    }
+
     async function exportCheckInAsPng() {
         if (isExporting) {
             return;
@@ -106,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         isExporting = true;
         appContainer.classList.add("is-exporting");
+        const restoreExportLayout = applyExportLayoutOverrides();
 
         try {
             exportCheckinButton.blur();
@@ -127,6 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("导出 PNG 失败：", error);
             alert("导出失败，请稍后重试。");
         } finally {
+            restoreExportLayout();
             appContainer.classList.remove("is-exporting");
             isExporting = false;
         }

@@ -50,7 +50,7 @@ test("main UI opens account migration in a hidden modal", () => {
 test("header action buttons share a distinct selected style from month controls", () => {
     assert.doesNotMatch(styleCss, /#user-bar\s*{[^}]*gap:/s);
     assert.match(styleCss, /#user-bar\s*{[^}]*margin-bottom: 16px;/s);
-    assert.match(styleCss, /#app\.is-exporting #user-bar\s*{[^}]*margin-bottom: 48px !important;/s);
+    assert.match(styleCss, /#app\.is-exporting #user-bar\s*{[^}]*margin-bottom: 96px !important;/s);
     assert.match(styleCss, /\.header-action-btn \+ \.header-action-btn\s*{[^}]*margin-left: 8px;/s);
     assert.match(styleCss, /\.header-action-btn\s*{[^}]*background: #7c8fda;/s);
     assert.match(styleCss, /\.header-action-btn:hover,[\s\S]*?\.header-action-btn\.active\s*{[^}]*background: #5f72c7;/s);
@@ -70,7 +70,14 @@ test("app script exports the full app DOM as a high-resolution png", () => {
     );
 
     assert.match(appScript, /const exportCheckinButton = document\.getElementById\("export-checkin"\)/);
+    assert.match(appScript, /const userBar = document\.getElementById\("user-bar"\)/);
     assert.match(appScript, /const EXPORT_PIXEL_RATIO = 4/);
+    assert.match(appScript, /const EXPORT_USER_BAR_MARGIN_BOTTOM = "96px"/);
+    assert.match(appScript, /const EXPORT_CONTROLS_MARGIN_TOP = "20px"/);
+    assert.match(appScript, /function applyExportLayoutOverrides\(\)/);
+    assert.match(appScript, /userBar\.style\.marginBottom = EXPORT_USER_BAR_MARGIN_BOTTOM/);
+    assert.match(appScript, /controls\.style\.marginTop = EXPORT_CONTROLS_MARGIN_TOP/);
+    assert.match(appScript, /restoreExportLayout\(\)/);
     assert.match(appScript, /async function exportCheckInAsPng\(\)/);
     assert.match(appScript, /appContainer\.classList\.add\("is-exporting"\)/);
     assert.match(appScript, /appContainer\.classList\.remove\("is-exporting"\)/);
