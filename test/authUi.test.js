@@ -68,10 +68,14 @@ test("app script exports the full app DOM as a high-resolution png", () => {
     assert.match(appScript, /const exportCheckinButton = document\.getElementById\("export-checkin"\)/);
     assert.match(appScript, /const EXPORT_PIXEL_RATIO = 4/);
     assert.match(appScript, /async function exportCheckInAsPng\(\)/);
+    assert.match(appScript, /await waitForStableExportFrame\(\)/);
+    assert.match(appScript, /appContainer\.getBoundingClientRect\(\)/);
     assert.match(appScript, /window\.htmlToImage\.toPng\(appContainer/);
     assert.match(appScript, /pixelRatio: EXPORT_PIXEL_RATIO/);
     assert.match(appScript, /cacheBust: true/);
     assert.match(appScript, /downloadLink\.download = buildExportFileName\(\)/);
+    assert.doesNotMatch(appScript, /appContainer\.scrollWidth/);
+    assert.doesNotMatch(appScript, /style:\s*{[\s\S]*width: `\$\{width\}px`/);
     assert.doesNotMatch(appScript, /renderHighDefinitionExportCanvas/);
     assert.doesNotMatch(appScript, /drawExportCalendar/);
 });
