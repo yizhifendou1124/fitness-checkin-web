@@ -32,8 +32,7 @@ test("login UI defaults to fixed user password mode and can switch to email OTP"
 test("main UI opens account migration in a hidden modal", () => {
     assert.doesNotMatch(indexHtml, /id="user-email"/);
     assert.match(indexHtml, /id="open-migration"[^>]+class="header-action-btn"/);
-    assert.doesNotMatch(indexHtml, /id="export-checkin"/);
-    assert.doesNotMatch(indexHtml, />导出</);
+    assert.match(indexHtml, /id="export-checkin"[^>]+class="header-action-btn"/);
     assert.match(indexHtml, /id="logout"[^>]+class="header-action-btn"/);
     assert.match(indexHtml, /id="migration-modal"[^>]+class="hidden"/);
     assert.match(indexHtml, /id="migration-panel"/);
@@ -54,20 +53,24 @@ test("header action buttons share a distinct selected style from month controls"
     assert.doesNotMatch(styleCss, /\.logout-btn\s*{[^}]*background:/s);
 });
 
-test("page does not expose image export", () => {
-    assert.doesNotMatch(indexHtml, /html2canvas@1\.4\.1/);
-    assert.doesNotMatch(indexHtml, /id="export-checkin"/);
+test("page exposes high-resolution app image export", () => {
+    assert.match(indexHtml, /html-to-image@1\.11\.11/);
+    assert.match(indexHtml, /id="export-checkin"[^>]+class="header-action-btn"/);
 });
 
-test("app script does not include export rendering logic", () => {
+test("app script exports the full app DOM as a high-resolution png", () => {
     const appScript = fs.readFileSync(
         path.join(__dirname, "..", "src", "scripts", "app.auth.js"),
         "utf8"
     );
 
-    assert.doesNotMatch(appScript, /exportCheckinButton/);
-    assert.doesNotMatch(appScript, /exportCheckInAsPng/);
+    assert.match(appScript, /const exportCheckinButton = document\.getElementById\("export-checkin"\)/);
+    assert.match(appScript, /const EXPORT_PIXEL_RATIO = 4/);
+    assert.match(appScript, /async function exportCheckInAsPng\(\)/);
+    assert.match(appScript, /window\.htmlToImage\.toPng\(appContainer/);
+    assert.match(appScript, /pixelRatio: EXPORT_PIXEL_RATIO/);
+    assert.match(appScript, /cacheBust: true/);
+    assert.match(appScript, /downloadLink\.download = buildExportFileName\(\)/);
     assert.doesNotMatch(appScript, /renderHighDefinitionExportCanvas/);
     assert.doesNotMatch(appScript, /drawExportCalendar/);
-    assert.doesNotMatch(appScript, /toBlob/);
 });

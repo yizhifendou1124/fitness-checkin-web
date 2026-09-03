@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
     const openMigrationButton = document.getElementById("open-migration");
+    const exportCheckinButton = document.getElementById("export-checkin");
     const logoutButton = document.getElementById("logout");
 
     const calendarContainer = document.getElementById("calendar-container");
@@ -39,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let currentDate = new Date();
     let currentUser = null;
+    let isExporting = false;
     const checkInData = new Set();
+    const EXPORT_PIXEL_RATIO = 4;
 
     // ================= 认证 =================
 
@@ -69,6 +72,54 @@ document.addEventListener("DOMContentLoaded", () => {
         migrationModal.classList.add("hidden");
         openMigrationButton.classList.remove("active");
         showMigrationMessage("", "");
+    }
+
+    function buildExportFileName() {
+        const monthText = currentMonthDisplay.textContent.trim().replace(/\s+/g, "-");
+        return `fitness-checkin-${monthText || "calendar"}.png`;
+    }
+
+    function downloadPng(dataUrl) {
+        const downloadLink = document.createElement("a");
+        downloadLink.href = dataUrl;
+        downloadLink.download = buildExportFileName();
+        downloadLink.click();
+    }
+
+    async function exportCheckInAsPng() {
+        if (isExporting) {
+            return;
+        }
+
+        if (!window.htmlToImage) {
+            alert("导出组件加载失败，请刷新页面后重试。");
+            return;
+        }
+
+        isExporting = true;
+
+        try {
+            const width = appContainer.scrollWidth;
+            const height = appContainer.scrollHeight;
+            const dataUrl = await window.htmlToImage.toPng(appContainer, {
+                pixelRatio: EXPORT_PIXEL_RATIO,
+                cacheBust: true,
+                backgroundColor: "#ffffff",
+                width,
+                height,
+                style: {
+                    width: `${width}px`,
+                    height: `${height}px`,
+                },
+            });
+
+            downloadPng(dataUrl);
+        } catch (error) {
+            console.error("导出 PNG 失败：", error);
+            alert("导出失败，请稍后重试。");
+        } finally {
+            isExporting = false;
+        }
     }
 
     function showAuthLoading(msg) {
@@ -408,6 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     openMigrationButton.addEventListener("click", openMigrationModal);
+    exportCheckinButton.addEventListener("click", exportCheckInAsPng);
     closeMigrationButton.addEventListener("click", closeMigrationModal);
     migrationModal.addEventListener("click", (event) => {
         if (event.target === migrationModal) {
