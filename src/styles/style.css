@@ -356,7 +356,6 @@ footer p {
 /* 用户栏（登录后显示在 header） */
 #user-bar {
     display: flex;
-    gap: 8px;
     justify-content: flex-end;
     align-items: center;
     margin-bottom: 16px;
@@ -373,6 +372,10 @@ footer p {
     font-size: 14px;
     cursor: pointer;
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+.header-action-btn + .header-action-btn {
+    margin-left: 8px;
 }
 
 .header-action-btn:hover,
