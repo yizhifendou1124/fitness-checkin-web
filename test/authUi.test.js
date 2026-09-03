@@ -48,6 +48,7 @@ test("main UI opens account migration in a hidden modal", () => {
 });
 
 test("header action buttons share a distinct selected style from month controls", () => {
+    assert.match(styleCss, /#user-bar\s*{[^}]*margin-bottom: 32px;/s);
     assert.match(styleCss, /\.header-action-btn\s*{[^}]*background: #7c8fda;/s);
     assert.match(styleCss, /\.header-action-btn:hover,[\s\S]*?\.header-action-btn\.active\s*{[^}]*background: #5f72c7;/s);
     assert.doesNotMatch(styleCss, /\.logout-btn\s*{[^}]*background:/s);

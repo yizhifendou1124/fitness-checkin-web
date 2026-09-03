@@ -359,7 +359,7 @@ footer p {
     gap: 8px;
     justify-content: flex-end;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
     font-size: 14px;
     color: #666;
 }
