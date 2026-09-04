@@ -391,20 +391,6 @@ footer p {
     opacity: 0.65;
 }
 
-#app.is-exporting #user-bar {
-    margin-bottom: 96px !important;
-}
-
-#app.is-exporting #export-checkin,
-#app.is-exporting #export-checkin:hover,
-#app.is-exporting #export-checkin:active,
-#app.is-exporting #export-checkin.active {
-    background: #7c8fda !important;
-    box-shadow: none !important;
-    transform: none !important;
-    transition: none !important;
-}
-
 /* 数据迁移 */
 #migration-modal {
     align-items: center;

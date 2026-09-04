@@ -22,9 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verifyOtpButton = document.getElementById("verify-otp");
     const backToEmailButton = document.getElementById("back-to-email");
     const openMigrationButton = document.getElementById("open-migration");
-    const exportCheckinButton = document.getElementById("export-checkin");
     const logoutButton = document.getElementById("logout");
-    const userBar = document.getElementById("user-bar");
 
     const calendarContainer = document.getElementById("calendar-container");
     const currentMonthDisplay = document.getElementById("current-month");
@@ -41,11 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let currentDate = new Date();
     let currentUser = null;
-    let isExporting = false;
     const checkInData = new Set();
-    const EXPORT_PIXEL_RATIO = 4;
-    const EXPORT_USER_BAR_MARGIN_BOTTOM = "96px";
-    const EXPORT_CONTROLS_MARGIN_TOP = "20px";
 
     // ================= 认证 =================
 
@@ -75,79 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         migrationModal.classList.add("hidden");
         openMigrationButton.classList.remove("active");
         showMigrationMessage("", "");
-    }
-
-    function buildExportFileName() {
-        const monthText = currentMonthDisplay.textContent.trim().replace(/\s+/g, "-");
-        return `fitness-checkin-${monthText || "calendar"}.png`;
-    }
-
-    function downloadPng(dataUrl) {
-        const downloadLink = document.createElement("a");
-        downloadLink.href = dataUrl;
-        downloadLink.download = buildExportFileName();
-        downloadLink.click();
-    }
-
-    function waitForStableExportFrame() {
-        return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(resolve);
-            });
-        });
-    }
-
-    function applyExportLayoutOverrides() {
-        const previousUserBarMarginBottom = userBar.style.marginBottom;
-        const previousControlsMarginTop = controls.style.marginTop;
-
-        userBar.style.marginBottom = EXPORT_USER_BAR_MARGIN_BOTTOM;
-        controls.style.marginTop = EXPORT_CONTROLS_MARGIN_TOP;
-
-        return () => {
-            userBar.style.marginBottom = previousUserBarMarginBottom;
-            controls.style.marginTop = previousControlsMarginTop;
-        };
-    }
-
-    async function exportCheckInAsPng() {
-        if (isExporting) {
-            return;
-        }
-
-        if (!window.htmlToImage) {
-            alert("导出组件加载失败，请刷新页面后重试。");
-            return;
-        }
-
-        isExporting = true;
-        appContainer.classList.add("is-exporting");
-        const restoreExportLayout = applyExportLayoutOverrides();
-
-        try {
-            exportCheckinButton.blur();
-            await waitForStableExportFrame();
-
-            const appBounds = appContainer.getBoundingClientRect();
-            const width = Math.ceil(appBounds.width);
-            const height = Math.ceil(appBounds.height);
-            const dataUrl = await window.htmlToImage.toPng(appContainer, {
-                pixelRatio: EXPORT_PIXEL_RATIO,
-                cacheBust: true,
-                backgroundColor: "#ffffff",
-                width,
-                height,
-            });
-
-            downloadPng(dataUrl);
-        } catch (error) {
-            console.error("导出 PNG 失败：", error);
-            alert("导出失败，请稍后重试。");
-        } finally {
-            restoreExportLayout();
-            appContainer.classList.remove("is-exporting");
-            isExporting = false;
-        }
     }
 
     function showAuthLoading(msg) {
@@ -487,7 +408,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     openMigrationButton.addEventListener("click", openMigrationModal);
-    exportCheckinButton.addEventListener("click", exportCheckInAsPng);
     closeMigrationButton.addEventListener("click", closeMigrationModal);
     migrationModal.addEventListener("click", (event) => {
         if (event.target === migrationModal) {

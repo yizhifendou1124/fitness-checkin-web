@@ -32,7 +32,7 @@ test("login UI defaults to fixed user password mode and can switch to email OTP"
 test("main UI opens account migration in a hidden modal", () => {
     assert.doesNotMatch(indexHtml, /id="user-email"/);
     assert.match(indexHtml, /id="open-migration"[^>]+class="header-action-btn"/);
-    assert.match(indexHtml, /id="export-checkin"[^>]+class="header-action-btn"/);
+    assert.doesNotMatch(indexHtml, /id="export-checkin"/);
     assert.match(indexHtml, /id="logout"[^>]+class="header-action-btn"/);
     assert.match(indexHtml, /id="migration-modal"[^>]+class="hidden"/);
     assert.match(indexHtml, /id="migration-panel"/);
@@ -50,45 +50,24 @@ test("main UI opens account migration in a hidden modal", () => {
 test("header action buttons share a distinct selected style from month controls", () => {
     assert.doesNotMatch(styleCss, /#user-bar\s*{[^}]*gap:/s);
     assert.match(styleCss, /#user-bar\s*{[^}]*margin-bottom: 16px;/s);
-    assert.match(styleCss, /#app\.is-exporting #user-bar\s*{[^}]*margin-bottom: 96px !important;/s);
     assert.match(styleCss, /\.header-action-btn \+ \.header-action-btn\s*{[^}]*margin-left: 8px;/s);
     assert.match(styleCss, /\.header-action-btn\s*{[^}]*background: #7c8fda;/s);
     assert.match(styleCss, /\.header-action-btn:hover,[\s\S]*?\.header-action-btn\.active\s*{[^}]*background: #5f72c7;/s);
-    assert.match(styleCss, /#app\.is-exporting #export-checkin,[\s\S]*?#app\.is-exporting #export-checkin\.active\s*{[^}]*background: #7c8fda !important;[^}]*box-shadow: none !important;[^}]*transform: none !important;[^}]*transition: none !important;/s);
+    assert.doesNotMatch(styleCss, /#app\.is-exporting/);
     assert.doesNotMatch(styleCss, /\.logout-btn\s*{[^}]*background:/s);
 });
 
-test("page exposes high-resolution app image export", () => {
-    assert.match(indexHtml, /html-to-image@1\.11\.11/);
-    assert.match(indexHtml, /id="export-checkin"[^>]+class="header-action-btn"/);
-});
-
-test("app script exports the full app DOM as a high-resolution png", () => {
+test("page no longer exposes app image export", () => {
     const appScript = fs.readFileSync(
         path.join(__dirname, "..", "src", "scripts", "app.auth.js"),
         "utf8"
     );
 
-    assert.match(appScript, /const exportCheckinButton = document\.getElementById\("export-checkin"\)/);
-    assert.match(appScript, /const userBar = document\.getElementById\("user-bar"\)/);
-    assert.match(appScript, /const EXPORT_PIXEL_RATIO = 4/);
-    assert.match(appScript, /const EXPORT_USER_BAR_MARGIN_BOTTOM = "96px"/);
-    assert.match(appScript, /const EXPORT_CONTROLS_MARGIN_TOP = "20px"/);
-    assert.match(appScript, /function applyExportLayoutOverrides\(\)/);
-    assert.match(appScript, /userBar\.style\.marginBottom = EXPORT_USER_BAR_MARGIN_BOTTOM/);
-    assert.match(appScript, /controls\.style\.marginTop = EXPORT_CONTROLS_MARGIN_TOP/);
-    assert.match(appScript, /restoreExportLayout\(\)/);
-    assert.match(appScript, /async function exportCheckInAsPng\(\)/);
-    assert.match(appScript, /appContainer\.classList\.add\("is-exporting"\)/);
-    assert.match(appScript, /appContainer\.classList\.remove\("is-exporting"\)/);
-    assert.match(appScript, /await waitForStableExportFrame\(\)/);
-    assert.match(appScript, /appContainer\.getBoundingClientRect\(\)/);
-    assert.match(appScript, /window\.htmlToImage\.toPng\(appContainer/);
-    assert.match(appScript, /pixelRatio: EXPORT_PIXEL_RATIO/);
-    assert.match(appScript, /cacheBust: true/);
-    assert.match(appScript, /downloadLink\.download = buildExportFileName\(\)/);
-    assert.doesNotMatch(appScript, /appContainer\.scrollWidth/);
-    assert.doesNotMatch(appScript, /style:\s*{[\s\S]*width: `\$\{width\}px`/);
+    assert.doesNotMatch(indexHtml, /html-to-image@1\.11\.11/);
+    assert.doesNotMatch(indexHtml, /id="export-checkin"/);
+    assert.doesNotMatch(appScript, /exportCheckinButton/);
+    assert.doesNotMatch(appScript, /exportCheckInAsPng/);
+    assert.doesNotMatch(appScript, /htmlToImage/);
     assert.doesNotMatch(appScript, /renderHighDefinitionExportCanvas/);
     assert.doesNotMatch(appScript, /drawExportCalendar/);
 });
