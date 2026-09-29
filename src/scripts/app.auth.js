@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let currentDate = new Date();
     let currentUser = null;
+    let checkinsChannel = null;
     const checkInData = new Set();
 
     // ================= 认证 =================
@@ -154,11 +155,12 @@ document.addEventListener("DOMContentLoaded", () => {
         appContainer.classList.remove("hidden");
         authContainer.classList.add("hidden");
         migrationCurrentAccount.textContent = user.email || "";
-        await loadCloudData();
-        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        await refreshCloudData();
+        subscribeToCheckinChanges();
     }
 
     function handleSignedOut() {
+        unsubscribeFromCheckinChanges();
         currentUser = null;
         checkInData.clear();
         appContainer.classList.add("hidden");
@@ -217,12 +219,53 @@ document.addEventListener("DOMContentLoaded", () => {
         showMigrationMessage(`${actionText}完成：新增 ${copiedCount} 条，To 账号当前共 ${targetAfterCount} 条。`, "success");
 
         if (currentUser.email && targetEmail.toLowerCase() === currentUser.email.toLowerCase()) {
-            await loadCloudData();
-            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            await refreshCloudData();
         }
     }
 
     // ================= 数据同步 =================
+
+    async function refreshCloudData() {
+        if (!currentUser) {
+            return;
+        }
+
+        await loadCloudData();
+        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    }
+
+    function unsubscribeFromCheckinChanges() {
+        if (!checkinsChannel) {
+            return;
+        }
+
+        supabase.removeChannel(checkinsChannel);
+        checkinsChannel = null;
+    }
+
+    function subscribeToCheckinChanges() {
+        if (!currentUser) {
+            return;
+        }
+
+        unsubscribeFromCheckinChanges();
+
+        checkinsChannel = supabase
+            .channel(`checkins:${currentUser.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "checkins",
+                    filter: `user_id=eq.${currentUser.id}`,
+                },
+                () => {
+                    refreshCloudData();
+                }
+            )
+            .subscribe();
+    }
 
     // 从云端加载打卡数据，并自动迁移 localStorage 里的旧数据
     async function loadCloudData() {
@@ -420,6 +463,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     migrateDataButton.addEventListener("click", migrateData);
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            refreshCloudData();
+        }
+    });
+
+    window.addEventListener("focus", () => {
+        refreshCloudData();
+    });
 
     prevMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() - 1);

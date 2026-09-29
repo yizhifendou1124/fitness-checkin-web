@@ -71,3 +71,20 @@ test("page no longer exposes app image export", () => {
     assert.doesNotMatch(appScript, /renderHighDefinitionExportCanvas/);
     assert.doesNotMatch(appScript, /drawExportCalendar/);
 });
+
+test("app subscribes to remote checkin changes for cross-browser sync", () => {
+    const appScript = fs.readFileSync(
+        path.join(__dirname, "..", "src", "scripts", "app.auth.js"),
+        "utf8"
+    );
+
+    assert.match(appScript, /let checkinsChannel = null/);
+    assert.match(appScript, /function subscribeToCheckinChanges\(\)/);
+    assert.match(appScript, /supabase\s*\.\s*channel\(`checkins:\$\{currentUser\.id\}`\)/);
+    assert.match(appScript, /event: "\*"/);
+    assert.match(appScript, /filter: `user_id=eq\.\$\{currentUser\.id\}`/);
+    assert.match(appScript, /refreshCloudData\(\)/);
+    assert.match(appScript, /document\.addEventListener\("visibilitychange"/);
+    assert.match(appScript, /window\.addEventListener\("focus"/);
+    assert.match(appScript, /unsubscribeFromCheckinChanges\(\)/);
+});

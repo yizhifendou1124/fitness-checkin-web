@@ -16,6 +16,15 @@ create table if not exists public.checkins (
 -- 开启行级安全（RLS）：未登录/非本人一律读不到也写不进去
 alter table public.checkins enable row level security;
 
+-- 启用 Realtime：同一账号在不同浏览器打卡后，其他页面能收到变更通知。
+do $$
+begin
+  alter publication supabase_realtime add table public.checkins;
+exception
+  when duplicate_object then null;
+end;
+$$;
+
 -- 允许用户读取自己的打卡记录
 drop policy if exists "Users can read own checkins" on public.checkins;
 create policy "Users can read own checkins"

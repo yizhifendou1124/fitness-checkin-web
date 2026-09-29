@@ -20,3 +20,7 @@ test("schema exposes a safe email-to-email checkin migration function", () => {
     assert.match(schemaSql, /on conflict \(user_id, date\) do nothing/);
     assert.match(schemaSql, /grant execute on function public\.copy_checkins_between_emails\(text, text, text\) to authenticated/);
 });
+
+test("schema publishes checkins changes for Supabase realtime", () => {
+    assert.match(schemaSql, /alter publication supabase_realtime add table public\.checkins/);
+});
